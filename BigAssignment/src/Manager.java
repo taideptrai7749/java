@@ -12,7 +12,7 @@ public class Manager extends FullTimeStaff{
 
     @Override
     public double paySalary(int workedDays){
-        return 0;
+        return super.paySalary(workedDays) + this.allowance;
     }
 
     public String toString(){

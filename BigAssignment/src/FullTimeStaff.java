@@ -26,7 +26,12 @@ public class FullTimeStaff extends Staff{
 
     @Override
     public double paySalary(int workedDays) {
-        return 0;
+        double salary = this.baseSalary * this.bonusRate;
+        double bonus = 0;
+        if(workedDays > 21){
+            bonus = (workedDays - 21)*100000;
+        }
+        return (salary + bonus);
     }
 
     public String toString(){

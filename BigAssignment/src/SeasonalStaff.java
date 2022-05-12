@@ -12,7 +12,7 @@ public class SeasonalStaff extends Staff{
     }
 
     public double paySalary(int workedHours) {
-        return 0;
+        return this.hourlyWage * workedHours;
     }
 
     public String toString(){

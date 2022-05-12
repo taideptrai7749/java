@@ -62,33 +62,182 @@ public class StoreManagement {
 
     // requirement 1
     public ArrayList<Staff> loadStaffs(String filePath) {
-        //code here and modify the return value
-        return null;
+        ArrayList<Staff> staffsList = new ArrayList<Staff>();
+        ArrayList<String> data = loadFile(filePath);
+        for(String stringData: data){
+            String[] information = stringData.split(",");
+            if(information.length == 3){
+                staffsList.add(new SeasonalStaff(information[0], information[1], Integer.parseInt(information[2])));
+            }
+            else if(information.length == 4){
+                staffsList.add(new FullTimeStaff(information[0], information[1], Integer.parseInt(information[2]), Double.parseDouble(information[3])));
+            }
+            else {
+                staffsList.add(new Manager(information[0], information[1], Integer.parseInt(information[2]), Double.parseDouble(information[3]), Integer.parseInt(information[4])));
+            }
+        }
+        return staffsList;
     }
 
     // requirement 2
     public ArrayList<SeasonalStaff> getTopFiveSeasonalStaffsHighSalary() {
-        //code here and modify the return value
-        return null;
+        ArrayList<SeasonalStaff> seasonalStaffsList = new ArrayList<SeasonalStaff>();
+        for(Staff s: staffs){
+            if(s instanceof SeasonalStaff)
+            {
+                seasonalStaffsList.add((SeasonalStaff) s);
+            }
+        }
+        double salary[] = new double[seasonalStaffsList.size()];
+        int index = 0;
+        for(SeasonalStaff seasonalStaff: seasonalStaffsList){
+            for(String data: workingTime){
+                String[] information = data.split(",");
+                if(information[0].equalsIgnoreCase(seasonalStaff.sID)){
+                    salary[index] = seasonalStaff.paySalary(Integer.parseInt(information[1]));
+                }
+            }
+            index++;
+        }
+        for(int i = 0; i< seasonalStaffsList.size(); i++){
+            for (int j = i+1; j<seasonalStaffsList.size(); j++){
+                if(salary[i] < salary[j]){
+                    Collections.swap(seasonalStaffsList, i, j);
+                    double temp = salary[i];
+                    salary[i] = salary[j];
+                    salary[j] = temp;
+                }
+            }
+        }
+        ArrayList<SeasonalStaff> result = new ArrayList<SeasonalStaff>();
+        for (int i = 0; i< 5; i++){
+            result.add(seasonalStaffsList.get(i));
+        }
+        return result;
     }
 
     // requirement 3
     public ArrayList<FullTimeStaff> getFullTimeStaffsHaveSalaryGreaterThan(int lowerBound) {
-        //code here and modify the return value
-        return null;
+        ArrayList<FullTimeStaff> fullTimeStaffsList = new ArrayList<FullTimeStaff>();
+        for(Staff s: this.staffs){
+            if(s instanceof FullTimeStaff){
+                fullTimeStaffsList.add((FullTimeStaff) s);
+            }
+            else if(s instanceof Manager){
+                fullTimeStaffsList.add((FullTimeStaff) s);
+            }
+        }
+        double[] salary = new double[fullTimeStaffsList.size()];
+        int index = 0;
+        for(FullTimeStaff s: fullTimeStaffsList){
+            for(String data: workingTime){
+                String[] information = data.split(",");
+                if(information[0].equalsIgnoreCase(s.sID)){
+                    salary[index] = s.paySalary(Integer.parseInt(information[1]));
+                }
+            }
+            index++;
+        }
+        ArrayList<FullTimeStaff> result = new ArrayList<FullTimeStaff>();
+        for(int i = 0; i<fullTimeStaffsList.size(); i++){
+            if(salary[i] > lowerBound){
+                result.add(fullTimeStaffsList.get(i));
+            }
+        }
+        return result;
     }
 
     // requirement 4
     public double totalInQuarter(int quarter) {
         double total = 0;
-        // code here
+        ArrayList<Invoice> invoiceList = new ArrayList<Invoice>();
+        ArrayList<InvoiceDetails> details = new ArrayList<InvoiceDetails>();
+        String t1 = "01";
+        String t2 = "02";
+        String t3 = "03";
+        if(quarter == 2){
+            t1 = "04";
+            t2 = "05";
+            t3 = "06";
+        }
+        else if(quarter == 3){
+            t1 = "07";
+            t2 = "08";
+            t3 = "09";
+        }
+        else if(quarter == 4){
+            t1 = "10";
+            t2 = "11";
+            t3 = "12";
+        }
+        for(Invoice in: invoices){
+            String[] information = in.getDate().split("/");
+            if(information[1].equalsIgnoreCase(t1) || information[1].equalsIgnoreCase(t2) || information[1].equalsIgnoreCase(t3)){
+                invoiceList.add(in);
+                for(InvoiceDetails detail: invoiceDetails){
+                    if(in.getInvoiceID().equalsIgnoreCase(detail.getInvoiceID())){
+                        details.add(detail);
+                    }
+                }
+            }
+            continue;
+        }
+        for(InvoiceDetails detail: details){
+            for (Drink d: drinks){
+                if(detail.getDName().equalsIgnoreCase(d.getdName())){
+                    total = total + (detail.getAmount()*d.getPrice());
+                }
+            }
+        }
         return total;
     }
 
     // requirement 5
     public Staff getStaffHighestBillInMonth(int month) {
         Staff maxStaff = null;
-        //code here
+        ArrayList<Staff> staffsList = new ArrayList<Staff>();
+        ArrayList<Invoice> in = new ArrayList<Invoice>();
+        ArrayList<InvoiceDetails> details = new ArrayList<InvoiceDetails>();
+        for(Staff s: staffs){
+            staffsList.add(s);
+            for(Invoice invoice: invoices){
+                String[] data = invoice.getDate().split("/");
+                if(s.sID.equalsIgnoreCase(invoice.getStaffID()) && (month == Integer.parseInt(data[1]))){
+                    in.add(invoice);
+                    for(InvoiceDetails d: invoiceDetails){
+                        if(d.getInvoiceID().equalsIgnoreCase(invoice.getInvoiceID())){
+                            details.add(d);
+                        }
+                    }
+                }
+            }
+        }
+        double[] income = new double[staffsList.size()];
+        int index = 0;
+        for(Staff s: staffsList){
+            for(Invoice invoice: in){
+                if(s.sID.equalsIgnoreCase(invoice.getStaffID())){
+                    for(InvoiceDetails d: details){
+                        if(d.getInvoiceID().equalsIgnoreCase(invoice.getInvoiceID())){
+                            for(Drink drink: drinks){
+                                if(drink.getdName().equalsIgnoreCase(d.getDName())){
+                                    income[index] += (d.getAmount()*drink.getPrice());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            index++;
+        }
+        for(int i = 0; i<staffsList.size();i++){
+            if(maxStaff == null){
+                maxStaff = staffsList.get(i);
+            }
+            else if(income[i] > income[staffsList.indexOf(maxStaff)]){
+                maxStaff = staffsList.get(i);
+            }
+        }
         return maxStaff;
     }
 
