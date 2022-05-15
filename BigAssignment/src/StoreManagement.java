@@ -180,7 +180,6 @@ public class StoreManagement {
                     }
                 }
             }
-            continue;
         }
         for(InvoiceDetails detail: details){
             for (Drink d: drinks){
