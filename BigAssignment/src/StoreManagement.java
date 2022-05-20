@@ -72,7 +72,7 @@ public class StoreManagement {
             else if(information.length == 4){
                 staffsList.add(new FullTimeStaff(information[0], information[1], Integer.parseInt(information[2]), Double.parseDouble(information[3])));
             }
-            else {
+            else if(information.length == 5) {
                 staffsList.add(new Manager(information[0], information[1], Integer.parseInt(information[2]), Double.parseDouble(information[3]), Integer.parseInt(information[4])));
             }
         }
@@ -110,7 +110,7 @@ public class StoreManagement {
             }
         }
         ArrayList<SeasonalStaff> result = new ArrayList<SeasonalStaff>();
-        for (int i = 0; i< 5; i++){
+        for (int i = 0; i < 5 && i < seasonalStaffsList.size(); i++){
             result.add(seasonalStaffsList.get(i));
         }
         return result;
@@ -152,9 +152,14 @@ public class StoreManagement {
         double total = 0;
         ArrayList<Invoice> invoiceList = new ArrayList<Invoice>();
         ArrayList<InvoiceDetails> details = new ArrayList<InvoiceDetails>();
-        String t1 = "01";
-        String t2 = "02";
-        String t3 = "03";
+        String t1 = "";
+        String t2 = "";
+        String t3 = "";
+        if(quarter == 1){
+            t1 = "01";
+            t2 = "02";
+            t3 = "03";
+        }
         if(quarter == 2){
             t1 = "04";
             t2 = "05";
